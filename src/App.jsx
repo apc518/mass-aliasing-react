@@ -9,6 +9,7 @@ import ClipList, { clipsEx, setClipsEx } from "./components/ClipList.jsx";
 import AudioFileDrop from "./components/AudioFileDrop.jsx";
 import PlaybackRateControl from "./components/PlaybackRateControl.jsx";
 import MasterVolumeControl from "./components/MasterVolumeControl.jsx";
+import Swal from "sweetalert2";
 
 export const AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -122,6 +123,7 @@ function App() {
                 <button onClick={() => {
                     setClipsEx([]);
                     Clip.allClips = [];
+                    setOutputClipReady(false);
                 }}>
                     Clear all clips
                 </button>
