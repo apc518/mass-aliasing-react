@@ -19,8 +19,6 @@ export class Clip {
     }
 
     play(){
-        console.log("hello there")
-
         if(!audioCtx){
             initAudioCtx();
         }
