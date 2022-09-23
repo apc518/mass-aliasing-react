@@ -1,7 +1,7 @@
 import React from "react";
 
 import { audioCtx, initAudioCtx, globalVolumeSliderDefault, setGlobalVolume } from "../App.jsx";
-import { clipsEx } from "./ClipList.jsx";
+import { Clip } from "../classes/Clip";
 
 /**
  * returns the logarithm of x with in the input base
@@ -27,7 +27,7 @@ const doVolumeInput = e => {
     
     const val = convertSliderValueToAmplitude(e.target.value);
     setGlobalVolume(val);
-    for(let clip of clipsEx){
+    for(let clip of Clip.allClips){
         clip.setVolume(val);
     }
 }

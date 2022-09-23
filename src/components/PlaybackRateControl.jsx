@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { audioCtx, initAudioCtx, setGlobalSpeed } from "../App.jsx";
-import { clipsEx } from "./ClipList.jsx";
+import { Clip } from "../classes/Clip";
 
 const doSpeedInput = (e, setGlobSpeedDisplay) => {
     if(!audioCtx){
@@ -13,7 +13,7 @@ const doSpeedInput = (e, setGlobSpeedDisplay) => {
     setGlobSpeedDisplay(val);
     setGlobalSpeed(val);
     
-    for(let clip of clipsEx){
+    for(let clip of Clip.allClips){
         clip.setPlaybackRate(val);
     }
 }

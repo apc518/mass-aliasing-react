@@ -22,9 +22,7 @@ export const globalVolumeDefault = convertSliderValueToAmplitude(globalVolumeSli
 export let globalVolume = globalVolumeDefault;
 export let globalSpeed = 1;
 
-
 export const clipsMessageDefault = "No clips loaded.";
-export const clipsMessageLoading = "Loading clips...";
 
 export const setGlobalVolume = v => {
   globalVolume = v;
@@ -124,6 +122,7 @@ function App() {
 
                 <button onClick={() => {
                     setClipsEx([]);
+                    Clip.allClips = [];
                 }}>
                     Clear all clips
                 </button>
@@ -150,7 +149,7 @@ function App() {
             paddingBottom: '0.5rem'
         }}>
         <div><a className="footerLink" target="_blank" rel="noreferrer" href="https://youtu.be/U33ejbo3ro4" title="Video Inspiration">WangleLine</a></div>
-        <div><a className="footerLink" target="_blank" rel="noreferrer" href="https://github.com/apc518/realisr-2" title="Realisr 2 Github">GitHub</a></div>
+        <div><a className="footerLink" target="_blank" rel="noreferrer" href="https://github.com/apc518/mass-aliasing-react" title="Realisr 2 Github">GitHub</a></div>
         <div>Copyright &copy; 2022 <a className="footerLink" target="_blank" rel="noreferrer" href="https://chambercode.com/about/andy" title="ChamberCode Portfolio">Andy Chamberlain</a></div>
         </footer>
     </div>
