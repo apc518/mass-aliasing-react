@@ -22,9 +22,7 @@ export const globalVolumeDefault = convertSliderValueToAmplitude(globalVolumeSli
 export let globalVolume = globalVolumeDefault;
 export let globalSpeed = 1;
 
-
 export const clipsMessageDefault = "No clips loaded.";
-export const clipsMessageLoading = "Loading clips...";
 
 export const setGlobalVolume = v => {
   globalVolume = v;
