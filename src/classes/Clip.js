@@ -3,6 +3,8 @@ import {  globalSpeed, audioCtx, initAudioCtx, globalVolume } from "../App.jsx";
 import { clipsEx, setClipsEx } from "../components/ClipList.jsx";
 
 export class Clip {
+    static allClips = [];
+
     constructor(audioBuffer, name){
         // input
         this.name = name;
@@ -16,6 +18,8 @@ export class Clip {
         this.gainNode = null;
         this.playing = false;
         this.onEnded = () => {}
+
+        Clip.allClips.push(this);
     }
 
     play(){

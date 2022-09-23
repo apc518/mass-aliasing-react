@@ -8,7 +8,6 @@ export function massAlias(speedupFactor, clipsEx){
         for (let channel_idx = 0; channel_idx < 2; channel_idx++){
             // duplicate mono tracks to be stereo
             let channelData = clip.audioBuffer.getChannelData(channel_idx % clip.audioBuffer.numberOfChannels);
-            console.log(channelData.length);
             for (let i = 0; i < channelData.length; i += Math.round(speedupFactor)){
                 outputBuffers[channel_idx].push(channelData[i])
             }

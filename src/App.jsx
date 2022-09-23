@@ -124,6 +124,7 @@ function App() {
 
                 <button onClick={() => {
                     setClipsEx([]);
+                    Clip.allClips = [];
                 }}>
                     Clear all clips
                 </button>
