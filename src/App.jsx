@@ -9,6 +9,7 @@ import ClipList, { clipsEx, setClipsEx } from "./components/ClipList.jsx";
 import AudioFileDrop from "./components/AudioFileDrop.jsx";
 import PlaybackRateControl from "./components/PlaybackRateControl.jsx";
 import MasterVolumeControl from "./components/MasterVolumeControl.jsx";
+import Swal from "sweetalert2";
 
 export const AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -40,11 +41,10 @@ const speedupFactorDefault = 60;
 const speedupErrorColor = "#f88";
 const speedupGoodColor = "#fff"
 
-let outputClip;
-
 function App() {
   const [files, setFiles] = useState([]);
   const [clipsMessage, setClipsMessage] = useState(clipsMessageDefault);
+  const [outputClip, setOutputClip] = useState(null);
   const [outputClipReady, setOutputClipReady] = useState(false);
   const [speedupFactor, setSpeedupFactor] = useState(speedupFactorDefault);
   const [speedupFactorIsValid, setSpeedupFactorIsValid] = useState(true);
@@ -111,11 +111,20 @@ function App() {
                     onClick={() => {
                         if(!audioCtx) initAudioCtx();
 
-                        outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output");
+                        if(clipsEx.length == 0){
+                            Swal.fire({
+                                icon: 'info',
+                                text: 'I gotta have some clips! Drag and drop audio files onto the big yellow box :)'
+                            });
 
-                        outputClip.play();
-                        outputClip.generateDownload();
+                            return;
+                        }
 
+                        let _outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output"); 
+                        _outputClip.generateDownload();
+                        _outputClip.play();
+
+                        setOutputClip(_outputClip);
                         setOutputClipReady(true);
                     }}
                 >Mass Alias!</button>
@@ -123,6 +132,7 @@ function App() {
                 <button onClick={() => {
                     setClipsEx([]);
                     Clip.allClips = [];
+                    setOutputClipReady(false);
                 }}>
                     Clear all clips
                 </button>
