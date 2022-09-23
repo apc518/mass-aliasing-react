@@ -111,6 +111,15 @@ function App() {
                     onClick={() => {
                         if(!audioCtx) initAudioCtx();
 
+                        if(clipsEx.length == 0){
+                            Swal.fire({
+                                icon: 'info',
+                                text: 'I gotta have some clips! Drag and drop audio files onto the big yellow box :)'
+                            });
+
+                            return;
+                        }
+
                         let _outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output"); 
                         _outputClip.generateDownload();
                         _outputClip.play();
