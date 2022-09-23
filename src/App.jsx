@@ -40,11 +40,10 @@ const speedupFactorDefault = 60;
 const speedupErrorColor = "#f88";
 const speedupGoodColor = "#fff"
 
-let outputClip;
-
 function App() {
   const [files, setFiles] = useState([]);
   const [clipsMessage, setClipsMessage] = useState(clipsMessageDefault);
+  const [outputClip, setOutputClip] = useState(null);
   const [outputClipReady, setOutputClipReady] = useState(false);
   const [speedupFactor, setSpeedupFactor] = useState(speedupFactorDefault);
   const [speedupFactorIsValid, setSpeedupFactorIsValid] = useState(true);
@@ -111,11 +110,11 @@ function App() {
                     onClick={() => {
                         if(!audioCtx) initAudioCtx();
 
-                        outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output");
+                        let _outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output"); 
+                        _outputClip.generateDownload();
+                        _outputClip.play();
 
-                        outputClip.play();
-                        outputClip.generateDownload();
-
+                        setOutputClip(_outputClip);
                         setOutputClipReady(true);
                     }}
                 >Mass Alias!</button>
