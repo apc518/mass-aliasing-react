@@ -3,7 +3,8 @@ import './App.css'
 
 import { convertSliderValueToAmplitude } from './components/MasterVolumeControl.jsx';
 
-import { Clip } from './classes/Clip'; 
+import { Clip } from './classes/Clip';
+import { massAlias } from './classes/Aliaser'
 import ClipList, { clipsEx, setClipsEx } from "./components/ClipList.jsx";
 import AudioFileDrop from "./components/AudioFileDrop.jsx";
 import PlaybackRateControl from "./components/PlaybackRateControl.jsx";
@@ -85,51 +86,17 @@ function App() {
 
                 <button
                     onClick={() => {
-                        if(!audioCtx){
-                            initAudioCtx();
-                        }
+                        if(!audioCtx) initAudioCtx();
 
                         // mass alias!
                         const speedupFactor = 100;
 
-                        console.log(clipsEx);
-
-                        let outputBuffers = [[], []];
-
-                        for(let clip of clipsEx){
-                            for (let channel_idx = 0; channel_idx < 2; channel_idx++){
-                                // duplicate mono tracks to be stereo
-                                let channelData = clip.audioBuffer.getChannelData(channel_idx % clip.audioBuffer.numberOfChannels);
-                                console.log(channelData.length);
-                                for (let i = 0; i < channelData.length; i += speedupFactor){
-                                    outputBuffers[channel_idx].push(channelData[i])
-                                }
-                            }
-                        }
-
-                        for (let i = 0; i < outputBuffers.length; i++){
-                            outputBuffers[i] = Float32Array.from(outputBuffers[i]);
-                        }
-
-                        let outputAudioBuffer = new AudioBuffer({
-                            length: outputBuffers[0].length,
-                            numberOfChannels: outputBuffers.length,
-                            sampleRate: 44100
-                        });
-
-                        for(let i = 0; i < outputBuffers.length; i++){
-                            outputAudioBuffer.copyToChannel(outputBuffers[i], i);
-                        }
-
-                        outputClip = new Clip(outputAudioBuffer, "mass-aliasing-output");
+                        outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output");
 
                         outputClip.play();
                         outputClip.generateDownload();
 
                         setOutputClipReady(true);
-
-                        console.log(outputClip);
-
                     }}
                 >Mass Alias!</button>
 
