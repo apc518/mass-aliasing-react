@@ -38,6 +38,9 @@ export const initAudioCtx = () => {
   audioCtx = new AudioContext();
 }
 
+const speedupFactorDefault = 60;
+const speedupErrorColor = "#f88";
+const speedupGoodColor = "#fff"
 
 let outputClip;
 
@@ -45,6 +48,8 @@ function App() {
   const [files, setFiles] = useState([]);
   const [clipsMessage, setClipsMessage] = useState(clipsMessageDefault);
   const [outputClipReady, setOutputClipReady] = useState(false);
+  const [speedupFactor, setSpeedupFactor] = useState(speedupFactorDefault);
+  const [speedupFactorIsValid, setSpeedupFactorIsValid] = useState(true);
 
   return (
     <div
@@ -84,12 +89,29 @@ function App() {
                     />
                 </div>
 
+                <div style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
+                    <label htmlFor="speedupInput">Speedup Factor:</label>
+                    <input 
+                        id="speedupInput"
+                        type="number" 
+                        style={{ backgroundColor: speedupFactorIsValid ? speedupGoodColor : speedupErrorColor }}
+                        defaultValue={speedupFactorDefault}
+                        onInput={e => {
+                            if(e.target.value >= 1)
+                            {
+                                setSpeedupFactorIsValid(true);
+                                setSpeedupFactor(parseInt(e.target.value));
+                            }
+                            else{
+                                setSpeedupFactorIsValid(false);
+                            }
+                        }}
+                    ></input>
+                </div>
+                
                 <button
                     onClick={() => {
                         if(!audioCtx) initAudioCtx();
-
-                        // mass alias!
-                        const speedupFactor = 100;
 
                         outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output");
 
