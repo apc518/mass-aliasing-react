@@ -1,0 +1,47 @@
+
+html, body{
+  margin: 0;
+  height: 100%;
+  background: #1d1d21;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+button {
+  font-family: inherit;
+}
+
+.globalBtn {
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  font-size: 16px;
+  padding: 0;
+  border-radius: 0px;
+  border: none;
+  display: flex;
+  align-items: center;
+}
+
+.globalBtn:hover {
+  background-color: #bbb;
+}
+
+.closeButton:hover {
+  background-color: #666;
+}
+
+.footerLink {
+  color: #0bb
+}
+
+.footerLink:hover {
+  color: #bbb
+}
+
+.footerLink:active {
+  color: #b0b
+}
+
+#root{
+  height: 100%;
+}
