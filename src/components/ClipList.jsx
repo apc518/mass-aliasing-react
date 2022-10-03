@@ -146,6 +146,7 @@ export default function ClipList({ clipsMessage, clips, setClips }){
                     <div
                         style={{
                             width: 16,
+                            minWidth: 16,
                             height: 16,
                             float: 'right',
                             padding: 0,
