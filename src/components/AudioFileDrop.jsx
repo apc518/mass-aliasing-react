@@ -5,13 +5,13 @@ import {  audioCtx, initAudioCtx, lightTextColor, clipsMessageDefault } from '..
 import { setClipsEx, clipsEx } from "./ClipList.jsx";
 import { Clip } from "../classes/Clip.js";
 
-const inactiveColor = "#dd4";
-const activeColor = "#d77";
+const inactiveColor : string = "#dd4";
+const activeColor : string = "#d77";
 
 export default function AudioAudioFileDrop({ setClipsMessage }){
     const [bgColor, setBgColor] = useState(inactiveColor);
 
-    const loadFiles = fileList => {
+    const loadFiles = (fileList : FileList) => {
         setClipsMessage(`Loading clips (0/0)...`);
 
         if(!audioCtx){
@@ -20,14 +20,14 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
 
         const newClips = clipsEx.slice();
 
-        const files = [];
+        const files : File[] = [];
         for(let f of fileList){
             files.push(f);
         }
 
         let i = 0;
 
-        const failedFilenames = [];
+        const failedFilenames : String[] = [];
 
         const trySetClips = () => {
             if(i === files.length - 1){
@@ -37,7 +37,7 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
                 if(failedFilenames.length > 0){
                     Swal.fire({
                         icon: 'info',
-                        html: `These files could not be decoded as audio:<br/>${failedFilenames.toString().replaceAll(",", ", ")}`
+                        html: `These files could not be decoded as audio:<br/>${failedFilenames.toString().split(",").join(", ")}`
                     });
                 }
             }
@@ -89,12 +89,13 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
                 e.preventDefault();
                 e.stopPropagation();
 
-                const inputElem = document.createElement('input');
+                const inputElem : HTMLInputElement = document.createElement('input');
                 inputElem.type = 'file';
                 inputElem.multiple = true;
 
                 inputElem.onchange = () => {
-                    loadFiles(inputElem.files);
+                    if(inputElem.files)
+                        loadFiles(inputElem.files);
                 }
 
                 inputElem.click();
