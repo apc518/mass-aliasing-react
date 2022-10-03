@@ -1,9 +1,17 @@
 import {  globalSpeed, audioCtx, initAudioCtx, globalVolume } from "../App.jsx";
 
 export class Clip {
-    static allClips = [];
+    static allClips : Clip[] = [];
 
-    constructor(audioBuffer, name){
+    name : string;
+    audioBuffer : AudioBuffer;
+    blob : string | null;
+    audioBufferNode : AudioBufferSourceNode | null;
+    gainNode : GainNode | null;
+    playing : boolean;
+    onEnded : Function;
+
+    constructor(audioBuffer : AudioBuffer, name : string){
         // input
         this.name = name;
         this.audioBuffer = audioBuffer;
@@ -67,12 +75,12 @@ export class Clip {
 
     generateDownload(){
         // function by Russell Good, some modifications by me https://www.russellgood.com/how-to-convert-audiobuffer-to-audio-file/
-        const bufferToWave = (abuffer) => {
+        const bufferToWave = (abuffer : AudioBuffer) => {
             const numOfChan = abuffer.numberOfChannels;
             const length = abuffer.length * numOfChan * 2 + 44;
             let buffer = new ArrayBuffer(length);
             let view = new DataView(buffer);
-            let channels = [];
+            let channels : Float32Array[] = [];
             let pos = 0;
             let offset = 0;
             
@@ -124,6 +132,6 @@ export class Clip {
             return new Blob([buffer], { type: "audio/wav" });
         }
 
-        this.blob =  URL.createObjectURL(bufferToWave(this.audioBuffer));
+        this.blob = URL.createObjectURL(bufferToWave(this.audioBuffer));
     }
 }

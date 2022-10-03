@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 
-import { Clip } from "../classes/Clip.js";
+import { Clip } from "../classes/Clip";
 
 import {  audioCtx, initAudioCtx, lightTextColor, clipsMessageDefault } from '../App.jsx';
 import { forceUpdateClipList } from "./ClipList.jsx";
@@ -28,7 +28,7 @@ export default function AudioAudioFileDrop({ setClipsMessage, clips, setClips })
 
         let i = 0;
 
-        const failedFilenames : String[] = [];
+        const failedFilenames : string[] = [];
 
         const trySetClips = () => {
             if(i === files.length - 1){
