@@ -1,34 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import Swal from 'sweetalert2';
 
 import { audioCtx, initAudioCtx, lightGrayUI } from '../App.jsx';
 
-export let setClipsEx;
-export let clipsEx = [];
+export let forceUpdateClipList;
 
-const linkColorAtRest = "#0ff";
-
-export const resetClipsOutputs = () => {
-    for (let c of clipsEx) {
-        if(!(c.blob === null && c.outAudioBuffer === null && c.isRealised === false)){
+export const resetClipsOutputs = (clips, setClips) => {
+    for (let c of clips) {
+        if(!(c.blob === null && c.outAudioBuffer === null)){
             c.blob = null;
             c.outAudioBuffer = null;
-            c.isRealised = false;
         }
     }
-    setClipsEx([...clipsEx]); // refresh clip list
+    setClips([...clips]); // refresh clip list
 }
 
-export default function ClipList({ clipsMessage }){
-    const [linkColor, setLinkColor] = useState(linkColorAtRest);
-    const [clips, setClips] = useState([]); // don't use setClips directly, use setClipsEx instead
+export default function ClipList({ clipsMessage, clips, setClips }){
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     useEffect(() => {
-        setClipsEx = (x) => {
-            clipsEx = x;
-            setClips(x);
-        };
-        clipsEx = clips;
+        forceUpdateClipList = forceUpdate;
     }, []);
 
     return (
@@ -75,7 +66,7 @@ export default function ClipList({ clipsMessage }){
                             clip.stop();
                             clips.splice(idx, 1);
                             console.log(clip, clips);
-                            setClipsEx([...clips]);
+                            setClips([...clips]);
                         }}
                     >
                         <svg style={{ color: '#d44' }} fill="currentColor" focusable="false" viewBox="0 0 24 24" aria-hidden="true" data-testid="CloseIcon" aria-label="fontSize medium"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
@@ -96,38 +87,18 @@ export default function ClipList({ clipsMessage }){
 
                             if(clip.playing){
                                 clip.stop();
-                                setClipsEx([...clips]);
+                                setClips([...clips]);
                                 return;
                             }
                             else{
                                 clip.play();
-                                setClipsEx([...clips]);
+                                setClips([...clips]);
                             }
 
                         }}
                     >
                         {clip.playing ? "Stop" : "Play"}
                     </button>
-                    { (clip.blob && clip.isRealised) ?
-                        <>
-                        <br/>
-                        <a
-                            href={clip.blob}
-                            download={(() => {
-                                let pos = clip.name.lastIndexOf(".");
-                                let no_ext = clip.name.slice(0, pos);
-                                return no_ext + "_realised.wav";
-                            })()}
-                            style={{
-                                color: linkColor
-                            }}
-                            onMouseDown={() => setLinkColor("#fff")}
-                            onMouseUp={() => setLinkColor("#0ff")}
-                        >Download</a>
-                        </>
-                        :
-                        <></>
-                    }
                 </div>
             ))}
         </div>

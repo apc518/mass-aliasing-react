@@ -1,7 +1,5 @@
 import {  globalSpeed, audioCtx, initAudioCtx, globalVolume } from "../App.jsx";
 
-import { clipsEx, setClipsEx } from "../components/ClipList.jsx";
-
 export class Clip {
     static allClips = [];
 
@@ -35,7 +33,7 @@ export class Clip {
             source.playbackRate.value = globalSpeed;
             source.onended = () => {
                 this.playing = false;
-                setClipsEx([...clipsEx]);
+                this.onEnded();
             };
 
             source.connect(gainNode);

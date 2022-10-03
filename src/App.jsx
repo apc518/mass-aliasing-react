@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import './App.css'
 
 import { convertSliderValueToAmplitude } from './components/MasterVolumeControl.jsx';
 
 import { Clip } from './classes/Clip';
 import { massAlias } from './classes/Aliaser'
-import ClipList, { clipsEx, setClipsEx } from "./components/ClipList.jsx";
+import ClipList from "./components/ClipList.jsx";
 import AudioFileDrop from "./components/AudioFileDrop.tsx";
 import PlaybackRateControl from "./components/PlaybackRateControl.jsx";
 import MasterVolumeControl from "./components/MasterVolumeControl.jsx";
@@ -39,7 +39,7 @@ export const initAudioCtx = () => {
 
 const speedupFactorDefault = 60;
 const speedupErrorColor = "#f88";
-const speedupGoodColor = "#fff"
+const speedupGoodColor = "#fff";
 
 function App() {
   const [files, setFiles] = useState([]);
@@ -48,6 +48,7 @@ function App() {
   const [outputClipReady, setOutputClipReady] = useState(false);
   const [speedupFactor, setSpeedupFactor] = useState(speedupFactorDefault);
   const [speedupFactorIsValid, setSpeedupFactorIsValid] = useState(true);
+  const [clips, setClips] = useState([]);
 
   return (
     <div
@@ -84,6 +85,8 @@ function App() {
                         setFiles={setFiles}
                         audioCtx={audioCtx}
                         setClipsMessage={setClipsMessage}
+                        clips={clips}
+                        setClips={setClips}
                     />
                 </div>
 
@@ -111,7 +114,7 @@ function App() {
                     onClick={() => {
                         if(!audioCtx) initAudioCtx();
 
-                        if(clipsEx.length == 0){
+                        if(clips.length == 0){
                             Swal.fire({
                                 icon: 'info',
                                 text: 'I gotta have some clips! Drag and drop audio files onto the big yellow box :)'
@@ -120,7 +123,8 @@ function App() {
                             return;
                         }
 
-                        let _outputClip = new Clip(massAlias(speedupFactor, clipsEx), "mass-aliasing-output"); 
+                        let _outputClip = new Clip(massAlias(speedupFactor, clips), "mass-aliasing-output");
+                        // TODO: _outputClip.onEnded = () => { /* do something here? */ };
                         _outputClip.generateDownload();
                         _outputClip.play();
 
@@ -130,7 +134,7 @@ function App() {
                 >Mass Alias!</button>
 
                 <button onClick={() => {
-                    setClipsEx([]);
+                    setClips([]);
                     Clip.allClips = [];
                     setOutputClipReady(false);
                 }}>
@@ -149,7 +153,7 @@ function App() {
                 </>
             </div>
             
-            <ClipList clipsMessage={clipsMessage}/>
+            <ClipList clipsMessage={clipsMessage} clips={clips} setClips={setClips} />
         </div>
 
         <footer style={{

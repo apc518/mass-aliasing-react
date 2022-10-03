@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 
-import {  audioCtx, initAudioCtx, lightTextColor, clipsMessageDefault } from '../App.jsx';
-import { setClipsEx, clipsEx } from "./ClipList.jsx";
 import { Clip } from "../classes/Clip.js";
+
+import {  audioCtx, initAudioCtx, lightTextColor, clipsMessageDefault } from '../App.jsx';
+import { forceUpdateClipList } from "./ClipList.jsx";
 
 const inactiveColor : string = "#dd4";
 const activeColor : string = "#d77";
 
-export default function AudioAudioFileDrop({ setClipsMessage }){
+export default function AudioAudioFileDrop({ setClipsMessage, clips, setClips }){
     const [bgColor, setBgColor] = useState(inactiveColor);
 
     const loadFiles = (fileList : FileList) => {
@@ -18,7 +19,7 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
             initAudioCtx();
         }
 
-        const newClips = clipsEx.slice();
+        const newClips = clips.slice();
 
         const files : File[] = [];
         for(let f of fileList){
@@ -31,7 +32,7 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
 
         const trySetClips = () => {
             if(i === files.length - 1){
-                setClipsEx(newClips);
+                setClips(newClips);
                 setClipsMessage(clipsMessageDefault);
 
                 if(failedFilenames.length > 0){
@@ -48,16 +49,19 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
         let counter = 1;
         for(let f of files){
             f.arrayBuffer().then(res => {
-                audioCtx.decodeAudioData(res).then(decodedData => {
+                audioCtx.decodeAudioData(res).then((decodedData : AudioBuffer) => {
                     console.log(decodedData);
                     
-                    newClips.push(new Clip(decodedData, f.name));
-                    
+                    let clip = new Clip(decodedData, f.name);
+                    clip.onEnded = () => { forceUpdateClipList() }
+
+                    newClips.push(clip);
+
                     trySetClips();
                     
                     setClipsMessage(`Loading clips (${counter}/${files.length})...`);
                     counter += 1;
-
+                    
                     if(counter >= files.length){
                         setClipsMessage(clipsMessageDefault);
                     }
