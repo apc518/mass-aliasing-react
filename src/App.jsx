@@ -6,7 +6,7 @@ import { convertSliderValueToAmplitude } from './components/MasterVolumeControl.
 import { Clip } from './classes/Clip';
 import { massAlias } from './classes/Aliaser'
 import ClipList, { clipsEx, setClipsEx } from "./components/ClipList.jsx";
-import AudioFileDrop from "./components/AudioFileDrop.jsx";
+import AudioFileDrop from "./components/AudioFileDrop.tsx";
 import PlaybackRateControl from "./components/PlaybackRateControl.jsx";
 import MasterVolumeControl from "./components/MasterVolumeControl.jsx";
 import Swal from "sweetalert2";
