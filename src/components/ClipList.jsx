@@ -22,7 +22,7 @@ export const testClips = ["Billy Bob This is a very long name what will it do if
 let draggingIdx = -1;
 let draggedOverIdx = -1;
 
-const selectedOutlineStyle = '2px solid #f07';
+const selectedOutlineStyle = '4px solid #ff0046';
 
 export default function ClipList({ clipsMessage, clips, setClips }){
     const [, forceUpdate] = useReducer(x => x + 1, 0);
