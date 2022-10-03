@@ -5,7 +5,7 @@ import { convertSliderValueToAmplitude } from './components/MasterVolumeControl.
 
 import { Clip } from './classes/Clip';
 import { massAlias } from './classes/Aliaser'
-import ClipList from "./components/ClipList.jsx";
+import ClipList, { testClips } from "./components/ClipList.jsx";
 import AudioFileDrop from "./components/AudioFileDrop.tsx";
 import PlaybackRateControl from "./components/PlaybackRateControl.jsx";
 import MasterVolumeControl from "./components/MasterVolumeControl.jsx";
@@ -48,6 +48,7 @@ function App() {
   const [outputClipReady, setOutputClipReady] = useState(false);
   const [speedupFactor, setSpeedupFactor] = useState(speedupFactorDefault);
   const [speedupFactorIsValid, setSpeedupFactorIsValid] = useState(true);
+//   const [clips, setClips] = useState(testClips);
   const [clips, setClips] = useState([]);
 
   return (
