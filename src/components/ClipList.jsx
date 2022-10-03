@@ -90,6 +90,11 @@ export default function ClipList({ clipsMessage, clips, setClips }){
 
                     draggable
 
+                    onMouseDown={e => {
+                        selectOneClip(idx);
+                        forceUpdate();
+                    }}
+
                     onDragStart={e => {
                         selectOneClip(idx)
                         draggingIdx = idx;
