@@ -19,8 +19,12 @@ export const testClips = ["Billy Bob This is a very long name what will it do if
     }
 )
 
+const max = Math.max;
+const min = Math.min;
+
 let draggingIdx = -1;
 let draggedOverIdx = -1;
+let clipsCopy = [];
 
 const selectedOutlineStyle = '4px solid #ff0046';
 
@@ -32,28 +36,28 @@ export default function ClipList({ clipsMessage, clips, setClips }){
     }, []);
 
     const reorderClips = (fromIdx, toIdx) => {
-        if(fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
+        if(fromIdx < 0 || toIdx < 0 || clips.length !== clipsCopy.length) return;
 
         console.log("reordering", fromIdx, toIdx);
 
-        let clipsCopy = clips.slice();
-
         let direction = Math.sign(toIdx - fromIdx);
 
-        console.log({clipsCopy: clipsCopy.map(c => c.name), direction});
+        if (toIdx === fromIdx) direction = 0;
+
 
         for (let i = 0; i < clips.length; i++){
-            console.log("after", i, "iterations:", clipsCopy.map(c => c.name));
-            if ((fromIdx < i && i <= toIdx) || (toIdx <= i && i < fromIdx)){
-                clipsCopy[i - direction] = clips[i];
+            if(i == toIdx){
+                clips[i] = clipsCopy[fromIdx];
+            }
+            else if ((min(fromIdx, toIdx) <= i && i <= max(fromIdx, toIdx))){
+                clips[i] = clipsCopy[i + direction];
+            }
+            else{
+                clips[i] = clipsCopy[i];
             }
         }
 
-        clipsCopy[toIdx] = clips[fromIdx];
-
-        console.log("done:", clipsCopy.map(c => c.name));
-
-        setClips([...clipsCopy]);
+        clips[toIdx] = clipsCopy[fromIdx];
     }
 
     const selectOneClip = (idx) => {
@@ -90,19 +94,19 @@ export default function ClipList({ clipsMessage, clips, setClips }){
 
                     draggable
 
-                    onMouseDown={e => {
+                    onMouseDown={() => {
                         selectOneClip(idx);
                         forceUpdate();
                     }}
 
-                    onDragStart={e => {
+                    onDragStart={() => {
+                        clipsCopy = clips.slice();
                         selectOneClip(idx)
                         draggingIdx = idx;
                         forceUpdate();
                     }}
-                    onDragEnter={e => draggedOverIdx = idx}
-                    onDragEnd={e => {
-                        console.log(idx, e);
+                    onDragEnter={() => {
+                        draggedOverIdx = idx;
                         reorderClips(draggingIdx, draggedOverIdx);
                         forceUpdate();
                     }}
