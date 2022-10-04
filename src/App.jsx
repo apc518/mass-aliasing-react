@@ -55,6 +55,7 @@ function App() {
     <div
         style={{
             maxWidth: '100vw',
+            width: '100%',
             position: 'absolute',
             left: 0,
             top: 0,
@@ -77,7 +78,8 @@ function App() {
         </div>
 
         <div style={{
-            display: "flex"
+            display: "flex",
+            width: "100%"
         }}>
             <div>
                 <div style={{ display: "flex" }}>

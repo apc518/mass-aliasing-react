@@ -5,7 +5,8 @@ import { audioCtx, initAudioCtx, lightGrayUI } from '../App.jsx';
 
 export let forceUpdateClipList;
 
-export const testClips = ["Billy Bob This is a very long name what will it do if its a bit longer how about", "Joe Mama", "Pringles McGee", "Dang Rabbits", "Margarita Fahita"].map(n =>
+export const testClips = ["Billy Bob this is a very long name but its gotta be in order to test that my UI handles long filenames properly", 
+                            "Joe Mama", "Pringles McGee", "Dang Rabbits", "Margarita Fahita"].map(n =>
     {
         return {
             name: n,
@@ -36,14 +37,13 @@ export default function ClipList({ clipsMessage, clips, setClips }){
     }, []);
 
     const reorderClips = (fromIdx, toIdx) => {
-        if(fromIdx < 0 || toIdx < 0 || clips.length !== clipsCopy.length) return;
-
-        console.log("reordering", fromIdx, toIdx);
+        if(fromIdx < 0 || toIdx < 0 || clips.length !== clipsCopy.length)
+            return;
 
         let direction = Math.sign(toIdx - fromIdx);
-
-        if (toIdx === fromIdx) direction = 0;
-
+        
+        if (toIdx === fromIdx)
+            direction = 0;
 
         for (let i = 0; i < clips.length; i++){
             if(i == toIdx){
@@ -71,28 +71,28 @@ export default function ClipList({ clipsMessage, clips, setClips }){
         <div style={{ paddingLeft: 10 }}>{clipsMessage}</div>
         : 
         <div style={{
+            maxWidth: 500,
             marginLeft: 10,
+            marginRight: 10,
             height: 'fit-content'
         }}>
             {clips.map((clip, idx) => (
-                <div 
+                <div
                     key={idx}
+                    title={clip.name}
+                    draggable
                     style={{
                         display: 'flex',
-                        width: '100%',
                         height: 'fit-content',
                         background: lightGrayUI,
                         textAlign: 'center',
                         padding: 5,
                         marginBottom: 2,
-                        maxWidth: 600,
                         wordWrap: 'break-word',
                         borderRadius: 10,
                         userSelect: 'none',
                         outline: clips[idx].selected ? selectedOutlineStyle : 'none'
                     }}
-
-                    draggable
 
                     onMouseDown={() => {
                         selectOneClip(idx);
@@ -115,41 +115,43 @@ export default function ClipList({ clipsMessage, clips, setClips }){
                     <div style={{
                         float: 'left'
                     }}>
-                    <button
-                        onClick={() => {
-                            if(!audioCtx){
-                                initAudioCtx();
-                            }
-                            
-                            if (clip.audioBuffer.numberOfChannels < 1) {
-                                Swal.fire({
-                                    icon: "error",
-                                    text: "A file with no channels? No-can-do I'm afraid."
-                                });
-                            }
+                        <button
+                            onClick={e => {
+                                e.target.blur();
 
-                            if(clip.playing){
-                                clip.stop();
-                                forceUpdate();
-                            }
-                            else{
-                                clip.play();
-                                forceUpdate();
-                            }
-                        }}
-                    >
-                        {clip.playing ? "Stop" : "Play"}
-                    </button>
+                                if(!audioCtx){
+                                    initAudioCtx();
+                                }
+                                
+                                if (clip.audioBuffer.numberOfChannels < 1) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        text: "A file with no channels? No-can-do I'm afraid."
+                                    });
+                                }
+
+                                if(clip.playing){
+                                    clip.stop();
+                                    forceUpdate();
+                                }
+                                else{
+                                    clip.play();
+                                    forceUpdate();
+                                }
+                            }}
+                        >
+                            {clip.playing ? "Stop" : "Play"}
+                        </button>
                     </div>
 
                     <div style={{
                         overflow: 'hidden',
-                        width: 'auto',
+                        marginRight: 'auto',
                         whiteSpace: 'nowrap',
                         textOverflow: 'ellipsis',
                         paddingInline: '0.5rem',
                     }}>
-                    {clip.name}
+                        {clip.name}
                     </div>
                     
                     <div
@@ -157,6 +159,7 @@ export default function ClipList({ clipsMessage, clips, setClips }){
                             width: 16,
                             minWidth: 16,
                             height: 16,
+                            marginBlock: 'auto',
                             float: 'right',
                             padding: 0,
                             borderRadius: 8,
