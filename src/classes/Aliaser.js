@@ -1,10 +1,10 @@
 /**
  * returns an AudioBuffer
  */
-export function massAlias(speedupFactor, clipsEx){
+export function massAlias(speedupFactor, clipList){
     let outputBuffers = [[], []];
 
-    for(let clip of clipsEx){
+    for(let clip of clipList){
         for (let channel_idx = 0; channel_idx < 2; channel_idx++){
             // duplicate mono tracks to be stereo
             let channelData = clip.audioBuffer.getChannelData(channel_idx % clip.audioBuffer.numberOfChannels);

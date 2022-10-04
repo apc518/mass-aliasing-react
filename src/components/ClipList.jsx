@@ -1,35 +1,69 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import Swal from 'sweetalert2';
 
 import { audioCtx, initAudioCtx, lightGrayUI } from '../App.jsx';
 
-export let setClipsEx;
-export let clipsEx = [];
+export let forceUpdateClipList;
 
-const linkColorAtRest = "#0ff";
-
-export const resetClipsOutputs = () => {
-    for (let c of clipsEx) {
-        if(!(c.blob === null && c.outAudioBuffer === null && c.isRealised === false)){
-            c.blob = null;
-            c.outAudioBuffer = null;
-            c.isRealised = false;
+export const testClips = ["Billy Bob this is a very long name but its gotta be in order to test that my UI handles long filenames properly", 
+                            "Joe Mama", "Pringles McGee", "Dang Rabbits", "Margarita Fahita"].map(n =>
+    {
+        return {
+            name: n,
+            play: () => console.log(n, "play"),
+            stop: () => console.log(n, "stopped"),
+            playing: false,
+            audioBuffer: {
+                numberOfChannels: 2
+            }
         }
     }
-    setClipsEx([...clipsEx]); // refresh clip list
-}
+)
 
-export default function ClipList({ clipsMessage }){
-    const [linkColor, setLinkColor] = useState(linkColorAtRest);
-    const [clips, setClips] = useState([]); // don't use setClips directly, use setClipsEx instead
+const max = Math.max;
+const min = Math.min;
+
+let draggingIdx = -1;
+let draggedOverIdx = -1;
+let clipsCopy = [];
+
+const selectedOutlineStyle = '4px solid #ff0046';
+
+export default function ClipList({ clipsMessage, clips, setClips }){
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     useEffect(() => {
-        setClipsEx = (x) => {
-            clipsEx = x;
-            setClips(x);
-        };
-        clipsEx = clips;
+        forceUpdateClipList = forceUpdate;
     }, []);
+
+    const reorderClips = (fromIdx, toIdx) => {
+        if(fromIdx < 0 || toIdx < 0 || clips.length !== clipsCopy.length)
+            return;
+
+        let direction = Math.sign(toIdx - fromIdx);
+        
+        if (toIdx === fromIdx)
+            direction = 0;
+
+        for (let i = 0; i < clips.length; i++){
+            if(i == toIdx){
+                clips[i] = clipsCopy[fromIdx];
+            }
+            else if ((min(fromIdx, toIdx) <= i && i <= max(fromIdx, toIdx))){
+                clips[i] = clipsCopy[i + direction];
+            }
+            else{
+                clips[i] = clipsCopy[i];
+            }
+        }
+
+        clips[toIdx] = clipsCopy[fromIdx];
+    }
+
+    const selectOneClip = (idx) => {
+        clips.forEach(c => c.selected = false);
+        clips[idx].selected = true;
+    }
 
     return (
         <>
@@ -37,33 +71,95 @@ export default function ClipList({ clipsMessage }){
         <div style={{ paddingLeft: 10 }}>{clipsMessage}</div>
         : 
         <div style={{
-            display: 'grid',
-            gap: 10,
-            placeItems: 'flex-start',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gridTemplateRows: 'auto 1fr',
+            maxWidth: 500,
             marginLeft: 10,
+            marginRight: 10,
             height: 'fit-content'
         }}>
             {clips.map((clip, idx) => (
-                <div 
+                <div
                     key={idx}
+                    title={clip.name}
+                    draggable
                     style={{
-                        width: '100%',
+                        display: 'flex',
                         height: 'fit-content',
                         background: lightGrayUI,
                         textAlign: 'center',
                         padding: 5,
-                        maxWidth: 200,
+                        marginBottom: 2,
                         wordWrap: 'break-word',
                         borderRadius: 10,
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        outline: clips[idx].selected ? selectedOutlineStyle : 'none'
                     }}
+
+                    onMouseDown={() => {
+                        selectOneClip(idx);
+                        forceUpdate();
+                    }}
+
+                    onDragStart={() => {
+                        clipsCopy = clips.slice();
+                        selectOneClip(idx)
+                        draggingIdx = idx;
+                        forceUpdate();
+                    }}
+                    onDragEnter={() => {
+                        draggedOverIdx = idx;
+                        reorderClips(draggingIdx, draggedOverIdx);
+                        forceUpdate();
+                    }}
+                    onDragOver={e => e.preventDefault()}
                 >
+                    <div style={{
+                        float: 'left'
+                    }}>
+                        <button
+                            onClick={e => {
+                                e.target.blur();
+
+                                if(!audioCtx){
+                                    initAudioCtx();
+                                }
+                                
+                                if (clip.audioBuffer.numberOfChannels < 1) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        text: "A file with no channels? No-can-do I'm afraid."
+                                    });
+                                }
+
+                                if(clip.playing){
+                                    clip.stop();
+                                    forceUpdate();
+                                }
+                                else{
+                                    clip.play();
+                                    forceUpdate();
+                                }
+                            }}
+                        >
+                            {clip.playing ? "Stop" : "Play"}
+                        </button>
+                    </div>
+
+                    <div style={{
+                        overflow: 'hidden',
+                        marginRight: 'auto',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        paddingInline: '0.5rem',
+                    }}>
+                        {clip.name}
+                    </div>
+                    
                     <div
                         style={{
                             width: 16,
+                            minWidth: 16,
                             height: 16,
+                            marginBlock: 'auto',
                             float: 'right',
                             padding: 0,
                             borderRadius: 8,
@@ -75,59 +171,11 @@ export default function ClipList({ clipsMessage }){
                             clip.stop();
                             clips.splice(idx, 1);
                             console.log(clip, clips);
-                            setClipsEx([...clips]);
+                            forceUpdate();
                         }}
                     >
                         <svg style={{ color: '#d44' }} fill="currentColor" focusable="false" viewBox="0 0 24 24" aria-hidden="true" data-testid="CloseIcon" aria-label="fontSize medium"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
                     </div>
-                    {clip.name}<br/>
-                    <button
-                        onClick={() => {
-                            if(!audioCtx){
-                                initAudioCtx();
-                            }
-                            
-                            if (clip.audioBuffer.numberOfChannels < 1) {
-                                Swal.fire({
-                                    icon: "error",
-                                    text: "A file with no channels? No-can-do I'm afraid."
-                                });
-                            }
-
-                            if(clip.playing){
-                                clip.stop();
-                                setClipsEx([...clips]);
-                                return;
-                            }
-                            else{
-                                clip.play();
-                                setClipsEx([...clips]);
-                            }
-
-                        }}
-                    >
-                        {clip.playing ? "Stop" : "Play"}
-                    </button>
-                    { (clip.blob && clip.isRealised) ?
-                        <>
-                        <br/>
-                        <a
-                            href={clip.blob}
-                            download={(() => {
-                                let pos = clip.name.lastIndexOf(".");
-                                let no_ext = clip.name.slice(0, pos);
-                                return no_ext + "_realised.wav";
-                            })()}
-                            style={{
-                                color: linkColor
-                            }}
-                            onMouseDown={() => setLinkColor("#fff")}
-                            onMouseUp={() => setLinkColor("#0ff")}
-                        >Download</a>
-                        </>
-                        :
-                        <></>
-                    }
                 </div>
             ))}
         </div>

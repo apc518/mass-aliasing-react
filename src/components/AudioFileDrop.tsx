@@ -1,43 +1,44 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 
+import { Clip } from "../classes/Clip";
+
 import {  audioCtx, initAudioCtx, lightTextColor, clipsMessageDefault } from '../App.jsx';
-import { setClipsEx, clipsEx } from "./ClipList.jsx";
-import { Clip } from "../classes/Clip.js";
+import { forceUpdateClipList } from "./ClipList.jsx";
 
-const inactiveColor = "#dd4";
-const activeColor = "#d77";
+const inactiveColor : string = "#dd4";
+const activeColor : string = "#d77";
 
-export default function AudioAudioFileDrop({ setClipsMessage }){
+export default function AudioAudioFileDrop({ setClipsMessage, clips, setClips }){
     const [bgColor, setBgColor] = useState(inactiveColor);
 
-    const loadFiles = fileList => {
+    const loadFiles = (fileList : FileList) => {
         setClipsMessage(`Loading clips (0/0)...`);
 
         if(!audioCtx){
             initAudioCtx();
         }
 
-        const newClips = clipsEx.slice();
+        const newClips = clips.slice();
 
-        const files = [];
+        const files : File[] = [];
         for(let f of fileList){
             files.push(f);
         }
 
         let i = 0;
 
-        const failedFilenames = [];
+        const failedFilenames : string[] = [];
 
         const trySetClips = () => {
             if(i === files.length - 1){
-                setClipsEx(newClips);
+                setClips(newClips);
                 setClipsMessage(clipsMessageDefault);
 
                 if(failedFilenames.length > 0){
                     Swal.fire({
                         icon: 'info',
-                        html: `These files could not be decoded as audio:<br/>${failedFilenames.toString().replaceAll(",", ", ")}`
+                        html: `These files could not be decoded as audio:<br/>${failedFilenames.toString().split(",").join(", ")}`
                     });
                 }
             }
@@ -48,16 +49,19 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
         let counter = 1;
         for(let f of files){
             f.arrayBuffer().then(res => {
-                audioCtx.decodeAudioData(res).then(decodedData => {
+                audioCtx.decodeAudioData(res).then((decodedData : AudioBuffer) => {
                     console.log(decodedData);
                     
-                    newClips.push(new Clip(decodedData, f.name));
-                    
+                    let clip = new Clip(decodedData, f.name);
+                    clip.onEnded = () => { forceUpdateClipList() }
+
+                    newClips.push(clip);
+
                     trySetClips();
                     
                     setClipsMessage(`Loading clips (${counter}/${files.length})...`);
                     counter += 1;
-
+                    
                     if(counter >= files.length){
                         setClipsMessage(clipsMessageDefault);
                     }
@@ -89,12 +93,13 @@ export default function AudioAudioFileDrop({ setClipsMessage }){
                 e.preventDefault();
                 e.stopPropagation();
 
-                const inputElem = document.createElement('input');
+                const inputElem : HTMLInputElement = document.createElement('input');
                 inputElem.type = 'file';
                 inputElem.multiple = true;
 
                 inputElem.onchange = () => {
-                    loadFiles(inputElem.files);
+                    if(inputElem.files)
+                        loadFiles(inputElem.files);
                 }
 
                 inputElem.click();
